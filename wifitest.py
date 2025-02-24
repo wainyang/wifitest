@@ -4,7 +4,15 @@ import sys
 import time
 import argparse
 import os
-from pywifi import *
+
+# 检查依赖库 pywifi 是否已安装
+try:
+    from pywifi import *
+except ImportError:
+    print("未找到 pywifi 库，请安装该库：")
+    print("使用以下命令安装：")
+    print("pip install pywifi")
+    sys.exit(1)
 
 def get_wifi_interface():
     wifi = PyWiFi()
@@ -161,20 +169,24 @@ def main():
     print("1. 自动模式 (Auto Mode)")
     print("2. 手动模式 (Manual Mode)")
 
-    mode_choice = input("请输入模式编号（1 或 2）：")  # 改为 input()
-    while mode_choice not in ['1', '2']:
-        print("无效输入，请重新选择：")
-        mode_choice = input("请输入模式编号（1 或 2）：")  # 改为 input()
+    mode_choice = input("请输入模式编号（1 或 2）：")
+    if mode_choice == "1":
+        mode = 'a'
+    elif mode_choice == "2":
+        mode = 'm'
+    else:
+        print("无效的模式选择！")
+        return
 
-    mode = 'a' if mode_choice == '1' else 'm'
+    key_file = input("请输入密码字典文件路径（默认使用 top10.txt）：")
+    if not key_file:
+        key_file = "top10.txt"
 
-    print("请输入密码字典文件路径（默认使用 top10.txt）：")
-    key_file = input("文件路径：") or 'top10.txt'  # 默认是 top10.txt
-    while not os.path.exists(key_file):
-        print("文件不存在，请重新输入文件路径。")
-        key_file = input("文件路径：")
+    if not os.path.exists(key_file):
+        print("密码字典文件不存在，请检查文件路径！")
+        return
 
-    timeout = 30
+    timeout = 15  # 设置超时时间
     result_file = 'result.txt'
     keys = ''
     with open(key_file, "r", encoding='utf-8') as f:
